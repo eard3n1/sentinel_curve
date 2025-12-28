@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+
+build/
+models/
+data.csv
