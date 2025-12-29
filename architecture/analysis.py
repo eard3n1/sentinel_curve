@@ -8,14 +8,15 @@ from architecture.data import DataLoader as CustomDataLoader
 from architecture.model import RegressionModel
 
 class Analyzer:
-    def __init__(self, csv_path, window_size=5, batch_size=16, epochs=50, lr=0.001, future=0):
+    def __init__(self, csv_path, window_size=5, batch_size=16, epochs=50, lr=0.001, future=50, noise=0.01):
         self.data_loader = CustomDataLoader(csv_path, window_size)
         self.batch_size = batch_size
         self.epochs = epochs
         self.lr = lr
         self.future = future
-        self.model = None  
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.noise = noise
+        self.model = RegressionModel(input_size=2)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def prepare_data(self):
         X, y = self.data_loader.create_sequences()
@@ -23,7 +24,6 @@ class Analyzer:
         return TorchDataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
     def train(self):
-        self.model = RegressionModel(input_size=2)
         self.model.to(self.device)
         dataloader = self.prepare_data()
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
@@ -31,7 +31,7 @@ class Analyzer:
 
         self.model.train()
         for epoch in range(self.epochs):
-            total_loss = 0.0
+            total_loss = 0
             for batch_X, batch_y in dataloader:
                 batch_X = batch_X.to(self.device)
                 batch_y = batch_y.to(self.device)
@@ -46,7 +46,6 @@ class Analyzer:
 
     def predict(self, X):
         self.model.eval()
-        X = X.copy()
         predictions = []
 
         with torch.no_grad():
@@ -54,13 +53,13 @@ class Analyzer:
             pred = self.model(X_tensor).cpu().numpy()
             predictions.extend(pred)
 
-            if self.future > 0:
-                last_sequence = X[-1]
-                for _ in range(self.future):
-                    seq_tensor = torch.from_numpy(last_sequence[np.newaxis, ...]).float().to(self.device)
-                    next_pred = self.model(seq_tensor).cpu().numpy()[0]
-                    predictions.append(next_pred)
-                    last_sequence = np.vstack([last_sequence[1:], next_pred])
+            last_sequence = X[-1]
+            for _ in range(self.future):
+                seq_tensor = torch.from_numpy(last_sequence[np.newaxis, ...]).float().to(self.device)
+                next_pred = self.model(seq_tensor).cpu().numpy()[0]
+                next_pred += np.random.normal(scale=self.noise, size=next_pred.shape)
+                predictions.append(next_pred)
+                last_sequence = np.vstack([last_sequence[1:], next_pred])
         return self.data_loader.inverse_transform(np.array(predictions))
 
     def plot(self, pred_data):

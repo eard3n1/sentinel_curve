@@ -10,7 +10,7 @@ class DataLoader:
 
     def load(self):
         df = pd.read_csv(self.csv_path)
-        df = df[["cpu_percent", "mem_mb"]] # Only numeric columns
+        df = df[["cpu_percent", "mem_mb"]]
         scaled = self.scaler.fit_transform(df)
         return scaled
 
