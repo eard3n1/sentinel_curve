@@ -34,8 +34,14 @@ int main(int argc, char* argv[]) {
     int elapsed = 0;
     while (duration_sec < 0 || elapsed < duration_sec) {
         sentinel::Sample s = sentinel::collect_sample();
+
         out << sentinel::to_csv(s) << "\n";
         out.flush();
+
+        std::cout << "Timestamp: " << s.timestamp
+            << " | CPU: " << s.cpu_percent << "%"
+            << " | Memory: " << s.mem_mb << " MB"
+            << std::endl;
 
         std::this_thread::sleep_for(std::chrono::seconds(interval_sec));
         if (duration_sec > 0) elapsed += interval_sec;
