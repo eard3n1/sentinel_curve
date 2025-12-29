@@ -17,10 +17,9 @@ A resource monitoring & prediction tool that collects CPU/memory usage, feeds it
 - Matplotlib
 - Scikit-learn
 - Ipywidgets
-- Ipython>=8.0.0
+- Ipython
 
 ## Usage
-
 1. Run the pipeline:
     ```bash
     cd pipeline
