@@ -1,10 +1,11 @@
 # sentinel_curve
-A lightweight resource monitoring & prediction tool that collects CPU and memory usage on Windows, feeds it into a <a href="https://pytorch.org/">PyTorch</a> regression model, and predicts future resource usage interactively.
+A resource monitoring & prediction tool that collects CPU/memory usage, feeds it into a <a href="https://pytorch.org/">PyTorch</a> regression model that predicts future resource usage interactively.
 
 ## Features
-- Real-time CPU and memory monitoring via CSV (Windows)
+- Real-time CPU and memory monitoring via C++ (Windows)
 - Time-series regression using LSTM in Python (PyTorch)
 - Interactive predictions and plots in Jupyter Notebook
+- Comes with a Batch file to make things easier
 
 ## Prequisites
 - Windows
@@ -15,6 +16,8 @@ A lightweight resource monitoring & prediction tool that collects CPU and memory
 - Numpy
 - Matplotlib
 - Scikit-learn
+- Ipywidgets
+- Ipython>=8.0.0
 
 ## Usage
 
@@ -23,7 +26,7 @@ A lightweight resource monitoring & prediction tool that collects CPU and memory
     cd pipeline
     run.bat
     ```
-    This will create data/data.csv containing CPU (%) and memory (MB) usage.
+    This will create <code>data/data.csv</code> containing CPU (%) and memory (MB) usage.
 
 2. Install requirements:
     ```bash
