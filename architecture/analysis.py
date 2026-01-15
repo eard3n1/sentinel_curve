@@ -1,27 +1,27 @@
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader as TorchDataLoader, TensorDataset
+from torch.utils.data import DataLoader as DataLoader, TensorDataset
 import matplotlib.pyplot as plt
 import numpy as np
 
-from architecture.data import DataLoader as CustomDataLoader
+from architecture.data import DataReader
 from architecture.model import RegressionModel
 
 class Analyzer:
     def __init__(self, csv_path, window_size=5, batch_size=16, epochs=50, lr=0.001, future=50, noise=0.01):
-        self.data_loader = CustomDataLoader(csv_path, window_size)
+        self.data_loader = DataReader(csv_path, window_size)
         self.batch_size = batch_size
         self.epochs = epochs
         self.lr = lr
         self.future = future
         self.noise = noise
         self.model = RegressionModel(input_size=2)
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu") 
 
     def prepare_data(self):
         X, y = self.data_loader.create_sequences()
         dataset = TensorDataset(torch.from_numpy(X), torch.from_numpy(y))
-        return TorchDataLoader(dataset, batch_size=self.batch_size, shuffle=True)
+        return DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
     def train(self):
         self.model.to(self.device)
@@ -62,7 +62,7 @@ class Analyzer:
                 last_sequence = np.vstack([last_sequence[1:], next_pred])
         return self.data_loader.inverse_transform(np.array(predictions))
 
-    def plot(self, pred_data):
+    def plot_graph(self, pred_data):
         timesteps = np.arange(len(pred_data))
         fig, ax1 = plt.subplots(figsize=(12, 5))
 

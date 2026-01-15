@@ -2,20 +2,20 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
-class DataLoader:
+class DataReader: 
     def __init__(self, csv_path, window_size=5):
         self.csv_path = csv_path
         self.window_size = window_size
         self.scaler = MinMaxScaler()
 
-    def load(self):
+    def read(self):
         df = pd.read_csv(self.csv_path)
         df = df[["cpu_percent", "mem_mb"]]
         scaled = self.scaler.fit_transform(df)
         return scaled
 
     def create_sequences(self):
-        data = self.load()
+        data = self.read()
         X, y = [], []
         for i in range(len(data) - self.window_size):
             X.append(data[i:i+self.window_size])
